@@ -1,9 +1,9 @@
 import path from "node:path";
-import * as rd from "./road.ts"
+import * as rd from "ts-instrumentality/road";
 
-interface Change {
-  [path: string]: boolean
-}
+// interface Change {
+//   [path: string]: boolean
+// }
 
 const ARCHIVE = new rd.Folder('./archive')
 
