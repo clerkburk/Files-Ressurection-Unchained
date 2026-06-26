@@ -1,26 +1,37 @@
-import path from "node:path";
-import * as rd from "ts-instrumentality/road";
+import * as rd from "ts-instrumentality/road"
 
-// interface Change {
-//   [path: string]: boolean
-// }
+const f = new rd.TempFile()
+f.isAt = "dfsfgds"
 
-const ARCHIVE = new rd.Folder('./archive')
+// let CONTROLLER: {
+//   history: [target]
+
+// = JSON.parse(
+//   rd.Folder.home()
+//     .createFileSync('controller.jsonc')
+//     .readSync('utf-8')
+//     .replace(/^\s*\/\/.*\n/, '')
+// ) // true = added or modified, false = removed
+
+// let ARCHIVE = new rd.Folder('./archive')
+
 
 // Create a temporary folder that reflects the last state of the store by incrementing all changes
 using STORE = new rd.TempFolder()
-STORE.move_sync(new rd.Folder('./'))
-for (const base of ARCHIVE.list_sync(rd.Folder)) {
-  const changes = JSON.parse(base.find_sync('@changes.json', rd.File)?.read_sync('utf-8') || '{}') as Change
-  for (const selected of base.list_sync()) {
+STORE.moveSync(new rd.Folder('./'))
+for (let base of ARCHIVE.itSync(rd.Folder)) {
+  const changes = JSON.parse(base.findSync('@changes.json', rd.File)!.readSync('utf-8'))
+  for (const selected of base.listSync()) {
     if (!changes) {
-      selected.copy_sync(STORE)
+      selected.copySync(STORE)
       continue
     }
-    else if (changes[selected.name()] === false)
-      STORE.find_sync(selected.name())!.delete_sync()
-    else if (changes[selected.name()] === true || selected.name() !== '@changes.json')
-      selected.copy_sync(STORE)
+    else if (changes[selected.name] === false)
+      STORE.findSync(selected.name)!.deleteSync()
+    else if (changes[selected.name] === true || selected.name !== '@changes.json')
+      selected.copySync(STORE)
+    else
+      throw new Error(`Unexpected case for ${selected} with changes ${changes[selected.name]}`)
   }
 }
 
